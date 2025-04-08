@@ -1,13 +1,15 @@
 import css from './MovieDetailsPage.module.css'
-import { useParams, useLocation, Link, Outlet } from 'react-router-dom';
+import { useParams, useLocation, Link, Outlet, useNavigate } from 'react-router-dom';
 import { fetchFilm } from '../../tmbd.js'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import MovieCast from '../../components/MovieCast/MovieCast.jsx';
 import MovieReviews from '../../components/MovieReviews/MovieReviews.jsx';
 
 export default function MovieDetailsPage() {
     const { movieId } = useParams();
     const location = useLocation();
+    const navigate = useNavigate();
+    const backLinkRef = useRef(location.state?.from || '/movies');
     const [film, setFilm] = useState(null);
 
     useEffect(() => {
@@ -26,6 +28,9 @@ export default function MovieDetailsPage() {
     
     return(
         <div className={css.film}>
+            <button onClick={() => navigate(backLinkRef.current)} className={css.backButton}>
+                Go back
+            </button>
             <img src={film.poster_path 
                     ? `https://image.tmdb.org/t/p/w200${film.poster_path}`
                     : 'https://via.placeholder.com/200x300?text=No+Image'}
@@ -42,8 +47,8 @@ export default function MovieDetailsPage() {
             </div>
             <div>
                 <ul>
-                    <li><Link to='cast' state={{ from: location }}>Cast</Link></li>
-                    <li><Link to='reviews' state={{ from: location }}>Reviews</Link></li>
+                    <li><Link to='cast' state={{ from: backLinkRef.current }}>Cast</Link></li>
+                    <li><Link to='reviews' state={{ from: backLinkRef.current }}>Reviews</Link></li>
                 </ul>
             </div>
             <Outlet />
